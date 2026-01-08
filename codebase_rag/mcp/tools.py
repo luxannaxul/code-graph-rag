@@ -30,6 +30,7 @@ from codebase_rag.types_defs import (
     MCPInputSchema,
     MCPInputSchemaProperty,
     MCPToolSchema,
+    QueryResultDict,
 )
 from codebase_rag.utils.dependencies import has_semantic_dependencies
 
@@ -107,6 +108,22 @@ class MCPToolsRegistry:
                 ),
                 handler=self.update_repository,
                 returns_json=False,
+            ),
+            cs.MCPToolName.QUERY_CODE_GRAPH: ToolMetadata(
+                name=cs.MCPToolName.QUERY_CODE_GRAPH,
+                description=td.MCP_TOOLS[cs.MCPToolName.QUERY_CODE_GRAPH],
+                input_schema=MCPInputSchema(
+                    type=cs.MCPSchemaType.OBJECT,
+                    properties={
+                        cs.MCPParamName.NATURAL_LANGUAGE_QUERY: MCPInputSchemaProperty(
+                            type=cs.MCPSchemaType.STRING,
+                            description=td.MCP_PARAM_NATURAL_LANGUAGE_QUERY,
+                        )
+                    },
+                    required=[cs.MCPParamName.NATURAL_LANGUAGE_QUERY],
+                ),
+                handler=self.query_code_graph,
+                returns_json=True,
             ),
             cs.MCPToolName.GET_CODE_SNIPPET: ToolMetadata(
                 name=cs.MCPToolName.GET_CODE_SNIPPET,
@@ -292,6 +309,34 @@ class MCPToolsRegistry:
             query=natural_language_query, top_k=top_k
         )
         return str(result)
+
+    async def query_code_graph(
+        self, natural_language_query: str
+    ) -> QueryResultDict:
+        logger.info(
+            lg.MCP_QUERY_CODE_GRAPH.format(query=natural_language_query)
+        )
+        try:
+            graph_data = await self._query_tool.function(
+                natural_language_query
+            )
+            result_dict: QueryResultDict = graph_data.model_dump()
+            logger.info(
+                lg.MCP_QUERY_RESULTS.format(
+                    count=len(result_dict.get(cs.DICT_KEY_RESULTS, []))
+                )
+            )
+            return result_dict
+        except Exception as e:
+            logger.exception(lg.MCP_ERROR_QUERY.format(error=e))
+            return QueryResultDict(
+                error=str(e),
+                query_used=cs.QUERY_NOT_AVAILABLE,
+                results=[],
+                summary=cs.MCP_TOOL_EXEC_ERROR.format(
+                    name=cs.MCPToolName.QUERY_CODE_GRAPH, error=e
+                ),
+            )
 
     async def get_code_snippet(
         self, qualified_name: str
