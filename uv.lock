@@ -1041,10 +1041,12 @@ dependencies = [
     { name = "pymgclient" },
     { name = "python-dotenv" },
     { name = "rich" },
+    { name = "starlette" },
     { name = "toml" },
     { name = "tree-sitter" },
     { name = "tree-sitter-python" },
     { name = "typer" },
+    { name = "uvicorn" },
     { name = "watchdog" },
 ]
 
@@ -1106,6 +1108,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "qdrant-client", marker = "extra == 'semantic'", specifier = ">=1.9.0" },
     { name = "rich", specifier = ">=13.7.1" },
+    { name = "starlette", specifier = ">=0.40.0" },
     { name = "testcontainers", marker = "extra == 'test'", specifier = ">=4.9.0" },
     { name = "toml", specifier = ">=0.10.2" },
     { name = "torch", marker = "extra == 'semantic'", specifier = ">=2.6.0" },
@@ -1122,6 +1125,7 @@ requires-dist = [
     { name = "tree-sitter-scala", marker = "extra == 'treesitter-full'", specifier = ">=0.24.0" },
     { name = "tree-sitter-typescript", marker = "extra == 'treesitter-full'", specifier = ">=0.23.2" },
     { name = "typer", specifier = ">=0.12.5" },
+    { name = "uvicorn", specifier = ">=0.30.0" },
     { name = "watchdog", specifier = ">=6.0.0" },
 ]
 provides-extras = ["test", "treesitter-full", "semantic"]
